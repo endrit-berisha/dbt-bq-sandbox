@@ -1,0 +1,13 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account-json
+      project: "{{ env_var('BQ_PROJECT') }}"
+      dataset: "{{ env_var('BQ_DATASET') }}"
+      keyfile_json: "{{ env_var('BQ_KEYFILE_JSON') }}"
+      location: "{{ env_var('BQ_LOCATION') }}"
+      threads: 1
+      timeout_seconds: 300
+      retries: 1
