@@ -1,0 +1,11 @@
+
+version: 2
+
+
+sources:
+  - name: TEST
+    database: sdg-data-engineering
+    schema: raw
+    tables:
+      - name: dim_products
+
