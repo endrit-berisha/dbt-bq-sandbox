@@ -91,8 +91,8 @@ jobs:
       - name: Determine Deployment
         run: |
           if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
-            echo "DBT changes detected. Proceeding with deployment."
             if [ "${{ github.event_name }}" == "pull_request" ]; then
+              echo "DBT changes detected. Proceeding with pre-deployment."
               python pr_database_manager.py \
                 --project_id=${{ secrets.BQ_PROJECT }} \
                 --dataset_id="pr_${{ github.event.number }}_db" \
@@ -100,6 +100,7 @@ jobs:
                 --dbt_path=./dbt \
                 --dbt_target="dev"
             else
+              echo "DBT changes detected. Proceeding with deployment."
               python pr_database_manager.py \
                 --project_id=${{ secrets.BQ_PROJECT }} \
                 --dataset_id="dev" \
