@@ -52,17 +52,15 @@ jobs:
           CHANGED: ${{ steps.changed.outputs.dbt }}
         name: Check for DBT changes
         run: |
-          for file in $CHANGED; do
-            if [[ $file == dbt/** ]]; then
-              echo "DBT_CHANGES=TRUE" >> $GITHUB_OUTPUT
-              echo "DBT changes found in $file"
-              exit 0
-            fi
-          done
+          if [[ -n "$CHANGED" ]]; then
+            echo "DBT_CHANGES=TRUE" >> $GITHUB_OUTPUT
+            echo "DBT changes found in $CHANGED"
+          else
+            echo "DBT_CHANGES=FALSE" >> $GITHUB_OUTPUT
 
       - name: Echo DBT changes status
         run: |
-          echo "DBT changes status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}"
+          echo "DBT changes status: ${{ needs.check.outputs.status }}"
 
   apply:
     name: Deploy DBT changes
