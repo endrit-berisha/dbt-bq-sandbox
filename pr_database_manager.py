@@ -20,6 +20,7 @@ def delete_dataset(client, dataset_id):
 def run_dbt_command(command):
   """Run a DBT command."""
   result = subprocess.run(command, shell=True, capture_output=True, text=True)
+  print(command, result)
   if result.returncode != 0:
     print(f"Command failed: {command}")
     print(result.stderr)
@@ -43,7 +44,7 @@ def main(project_id, dataset_id, credentials_json, dbt_path, dbt_target, cleanup
 
   try:
     run_dbt_command(f"cd {dbt_path} && dbt deps")
-    run_dbt_command(f"cd {dbt_path} && dbt run --profiles-dir . --target {dbt_target}")
+    run_dbt_command(f"cd {dbt_path} && dbt run --target {dbt_target}")
     # run_dbt_command(f"cd {dbt_path} && dbt test --profiles-dir . --target {dbt_target}")
   except Exception as e:
     print(e)
