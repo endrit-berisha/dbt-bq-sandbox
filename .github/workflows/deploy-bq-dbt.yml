@@ -5,14 +5,12 @@ on:
     branches:
       - master
       - develop
-      - workflow
     paths:
       - 'dbt/**'
   push:
     branches:
       - master
       - develop
-      - workflow
     paths:
       - 'dbt/**'
 
@@ -55,4 +53,5 @@ jobs:
             echo "DBT_CHANGES=FALSE" >> $GITHUB_OUTPUT
 
       - name: Echo DBT changes status
-        run: echo "DBT changes status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}"
+        run: |
+          echo "DBT changes status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}"
