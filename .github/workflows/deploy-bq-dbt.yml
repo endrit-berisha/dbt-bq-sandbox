@@ -95,6 +95,11 @@ jobs:
           BQ_DATASET: ${{ secrets.BQ_DATASET }}
           BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }}
           BQ_LOCATION: ${{ secrets.BQ_LOCATION }}
+          PROF_CLIENT_CERT_URL: ${{ secrets.PROF_CLIENT_CERT_URL }}
+          PROF_CLIENT_EMAIL: ${{ secrets.PROF_CLIENT_EMAIL }}
+          PROF_CLIENT_ID: ${{ secrets.PROF_CLIENT_ID }}
+          PROF_PRIVATE_KEY: ${{ secrets.PROF_PRIVATE_KEY }}
+          PROF_PRIVATE_KEY_ID: ${{ secrets.PROF_PRIVATE_KEY_ID }}
         run: |
           if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
             if [ "${{ github.event_name }}" == "pull_request" ]; then
