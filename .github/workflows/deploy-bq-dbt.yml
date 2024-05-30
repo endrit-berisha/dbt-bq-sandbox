@@ -100,6 +100,7 @@ jobs:
           PROF_CLIENT_ID: ${{ secrets.PROF_CLIENT_ID }}
           PROF_PRIVATE_KEY: ${{ secrets.PROF_PRIVATE_KEY }}
           PROF_PRIVATE_KEY_ID: ${{ secrets.PROF_PRIVATE_KEY_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
         run: |
           if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
             if [ "${{ github.event_name }}" == "pull_request" ]; then
