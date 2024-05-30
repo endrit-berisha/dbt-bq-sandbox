@@ -69,14 +69,11 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     steps:
-      - name: Echo DBT changes status
+      - name: Determine Deployment
         run: |
-          echo "DBT changes status: ${{ needs.check.outputs.dbt_changes }}"
-
-      - name: Proceed with deployment if DBT changes detected
-        if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE'
-        run: echo "DBT changes detected. Proceeding with deployment."
-
-      - name: Skip deployment if no DBT changes detected
-        if: ${{ needs.check.outputs.dbt_changes }} != 'TRUE'
-        run: echo "No DBT changes detected. Skipping deployment."
+          if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
+            echo "DBT changes detected. Proceeding with deployment."
+            # Add deployment commands here
+          else
+            echo "No DBT changes detected. Skipping deployment."
+          fi
