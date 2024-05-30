@@ -1,0 +1,58 @@
+name: BQ DBT
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+      - workflow
+    paths:
+      - 'dbt/**'
+  push:
+    branches:
+      - master
+      - develop
+      - workflow
+    paths:
+      - 'dbt/**'
+
+concurrency:
+  group: ${{ github.ref }}
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  check:
+    name: Check for DBT changes
+    runs-on: ubuntu-latest # Change this line to use GitHub-hosted runner
+    outputs:
+      status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - id: changed
+        uses: dorny/paths-filter@v2
+        name: Get Changed Files
+        with:
+          filters: |
+            dbt:
+              - 'dbt/**'
+
+      - id: dbt_changes
+        env:
+          CHANGED: ${{ steps.changed.outputs.dbt }}
+        name: Check for DBT changes
+        run: |
+          if [[ -n "$CHANGED" ]]; then
+            echo "DBT_CHANGES=TRUE" >> $GITHUB_OUTPUT
+            echo "DBT changes found in $CHANGED"
+          else
+            echo "DBT_CHANGES=FALSE" >> $GITHUB_OUTPUT
+
+      - name: Echo DBT changes status
+        run: echo "DBT changes status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}"
