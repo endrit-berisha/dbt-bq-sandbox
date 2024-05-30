@@ -50,7 +50,7 @@ jobs:
       - id: dbt_changes
         run: |
           if [[ -n "${{ steps.changed.outputs.dbt }}" ]]; then
-            echo "dbt_changes=true" >> $GITHUB_ENV
+            echo "dbt_changes=TRUE" >> $GITHUB_ENV
             echo "DBT changes found in ${{ steps.changed.outputs.dbt }}"
           else
             echo "dbt_changes=false" >> $GITHUB_ENV
@@ -74,9 +74,9 @@ jobs:
           echo "DBT changes status: ${{ needs.check.outputs.dbt_changes }}"
 
       - name: Proceed with deployment if DBT changes detected
-        if: ${{ needs.check.outputs.dbt_changes }} == true
+        if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE'
         run: echo "DBT changes detected. Proceeding with deployment."
 
       - name: Skip deployment if no DBT changes detected
-        if: ${{ needs.check.outputs.dbt_changes }} != true
+        if: ${{ needs.check.outputs.dbt_changes }} != 'TRUE'
         run: echo "No DBT changes detected. Skipping deployment."
