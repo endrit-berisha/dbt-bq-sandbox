@@ -60,10 +60,6 @@ jobs:
         name: Set DBT_CHANGES output
         run: echo "dbt_changes=${{ env.dbt_changes }}" >> $GITHUB_OUTPUT
 
-      - name: Echo DBT changes status
-        run: |
-          echo "DBT changes status: ${{ steps.set_output.outputs.dbt_changes }}"
-
   apply:
     name: Deploy DBT changes
     needs: check
