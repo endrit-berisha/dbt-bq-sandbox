@@ -89,16 +89,22 @@ jobs:
           project_id: ${{ secrets.BQ_PROJECT }}
 
       - name: Determine Deployment
+        
+        env:
+          BQ_PROJECT: ${{ secrets.BQ_PROJECT }}
+          BQ_DATASET: ${{ secrets.BQ_DATASET }}
+          BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }}
+          BQ_LOCATION: ${{ secrets.BQ_LOCATION }}
         run: |
           if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
             if [ "${{ github.event_name }}" == "pull_request" ]; then
               echo "DBT changes detected. Proceeding with pre-deployment."
               python pr_database_manager.py \
                 --project_id=${{ secrets.BQ_PROJECT }} \
-                --dataset_id="pr_${{ github.event.number }}_db" \
+                --dataset_id="pr_db" \
                 --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
                 --dbt_path=./dbt \
-                --dbt_target="dev"
+                --dbt_target="pr_db"
             else
               echo "DBT changes detected. Proceeding with deployment."
               python pr_database_manager.py \
@@ -138,7 +144,7 @@ jobs:
         run: |
           python pr_database_manager.py \
             --project_id=${{ secrets.BQ_PROJECT }} \
-            --dataset_id="pr_${{ github.event.number }}_db" \
+            --dataset_id="pr_db" \
             --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
             --dbt_path=./dbt \
             --dbt_target="dev" \
