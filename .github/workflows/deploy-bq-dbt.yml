@@ -70,3 +70,7 @@ jobs:
     steps:
       - name: Echo Deployment Triggered
         run: echo "DBT changes detected. Proceeding with deployment."
+
+      - name: Echo DBT changes status in apply job
+        run: | 
+          echo "DBT changes status: ${{ needs.check.outputs.status }}"
