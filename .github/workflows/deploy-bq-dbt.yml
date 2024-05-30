@@ -5,14 +5,12 @@ on:
     branches:
       - master
       - develop
-      - workflow
     paths:
       - 'dbt/**'
   push:
     branches:
       - master
       - develop
-      - workflow
     paths:
       - 'dbt/**'
 
@@ -28,7 +26,7 @@ permissions:
 jobs:
   check:
     name: Check for DBT changes
-    runs-on: ubuntu-latest # Change this line to use GitHub-hosted runner
+    runs-on: ubuntu-latest # Use GitHub-hosted runner
     outputs:
       status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}
     steps:
@@ -42,6 +40,10 @@ jobs:
           filters: |
             dbt:
               - 'dbt/**'
+
+      - name: Debug Changed Files
+        run: |
+          echo "Changed files: ${{ steps.changed.outputs.dbt }}"
 
       - id: dbt_changes
         env:
