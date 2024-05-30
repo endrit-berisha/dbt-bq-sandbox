@@ -32,6 +32,8 @@ def main(project_id, dataset_id, credentials_json, dbt_path, dbt_target, cleanup
   credentials = service_account.Credentials.from_service_account_info(
     json.loads(credentials_json)
   )
+
+  os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
  
   client = bigquery.Client(credentials=credentials, project=project_id)
 
