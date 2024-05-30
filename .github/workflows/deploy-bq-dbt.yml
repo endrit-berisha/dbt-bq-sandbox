@@ -63,3 +63,11 @@ jobs:
       - name: Echo DBT changes status
         run: |
           echo "DBT changes status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}"
+
+  apply:
+    name: Deploy DBT changes
+    if: ${{ needs.check.outputs.status }} == 'TRUE'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo Deployment Triggered
+        run: echo "DBT changes detected. Proceeding with deployment."
