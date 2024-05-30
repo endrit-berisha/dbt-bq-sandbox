@@ -57,6 +57,7 @@ jobs:
             echo "DBT changes found in $CHANGED"
           else
             echo "DBT_CHANGES=FALSE" >> $GITHUB_OUTPUT
+          fi
 
       - name: Echo DBT changes status
         run: |
