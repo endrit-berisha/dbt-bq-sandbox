@@ -28,9 +28,9 @@ permissions:
 jobs:
   check:
     name: Check for DBT changes
-    runs-on: ubuntu-latest # Use GitHub-hosted runner
+    runs-on: ubuntu-latest
     outputs:
-      status: ${{ steps.dbt_changes.outputs.DBT_CHANGES }}
+      dbt_changes: ${{ steps.dbt_changes.outputs.dbt_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -48,29 +48,30 @@ jobs:
           echo "Changed files: ${{ steps.changed.outputs.dbt }}"
 
       - id: dbt_changes
-        env:
-          CHANGED: ${{ steps.changed.outputs.dbt }}
-        name: Check for DBT changes
         run: |
-          if [[ -n "$CHANGED" ]]; then
-            echo "DBT_CHANGES=TRUE" >> $GITHUB_OUTPUT
-            echo "DBT changes found in $CHANGED"
+          if [[ -n "${{ steps.changed.outputs.dbt }}" ]]; then
+            echo "dbt_changes=true" >> $GITHUB_ENV
+            echo "DBT changes found in ${{ steps.changed.outputs.dbt }}"
           else
-            echo "DBT_CHANGES=FALSE" >> $GITHUB_OUTPUT
+            echo "dbt_changes=false" >> $GITHUB_ENV
           fi
+
+      - name: Set DBT_CHANGES output
+        run: echo "dbt_changes=${{ env.dbt_changes }}" >> $GITHUB_OUTPUT
 
       - name: Echo DBT changes status
         run: |
-          echo "DBT changes status: ${{ needs.check.outputs.status }}"
+          echo "DBT changes status: ${{ steps.dbt_changes.outputs.dbt_changes }}"
 
   apply:
     name: Deploy DBT changes
-    if: ${{ needs.check.outputs.status }} == 'TRUE'
+    needs: check
+    if: ${{ needs.check.outputs.dbt_changes }} == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Echo Deployment Triggered
         run: echo "DBT changes detected. Proceeding with deployment."
 
       - name: Echo DBT changes status in apply job
-        run: | 
-          echo "DBT changes status: ${{ needs.check.outputs.status }}"
+        run: |
+          echo "DBT changes status: ${{ needs.check.outputs.dbt_changes }}"
