@@ -30,7 +30,7 @@ jobs:
     name: Check for DBT changes
     runs-on: ubuntu-latest
     outputs:
-      dbt_changes: ${{ steps.dbt_changes.outputs.dbt_changes }}
+      dbt_changes: ${{ steps.set_output.outputs.dbt_changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -56,12 +56,13 @@ jobs:
             echo "dbt_changes=false" >> $GITHUB_ENV
           fi
 
-      - name: Set DBT_CHANGES output
+      - id: set_output
+        name: Set DBT_CHANGES output
         run: echo "dbt_changes=${{ env.dbt_changes }}" >> $GITHUB_OUTPUT
 
       - name: Echo DBT changes status
         run: |
-          echo "DBT changes status: ${{ steps.dbt_changes.outputs.dbt_changes }}"
+          echo "DBT changes status: ${{ steps.set_output.outputs.dbt_changes }}"
 
   apply:
     name: Deploy DBT changes
