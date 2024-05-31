@@ -1,0 +1,13 @@
+version: 2
+
+
+sources:
+  - name: TEST
+    database: sdg-data-engineering
+    # database: |
+    #   {% if target.name == "sbx" %} sdg-data-engineering
+    #   {% else %} "{{ env_var('BQ_ENV') }}_prod"
+    #   {% endif %}
+    schema: raw
+    tables:
+      - name: dim_products
