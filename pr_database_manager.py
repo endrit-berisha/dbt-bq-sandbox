@@ -25,7 +25,8 @@ def run_dbt_command(command):
 
 def main(project_id, dataset_id, credentials_json, dbt_path, dbt_target, cleanup=False):
   credentials = service_account.Credentials.from_service_account_info(json.loads(credentials_json))
-  client = bigquery.Client(credentials=credentials, project=project_id)
+  # client = bigquery.Client(credentials=credentials, project=project_id)
+  client = ''
 
   if cleanup: # Drop PR dataset
     delete_dataset(client, dataset_id)
@@ -35,9 +36,9 @@ def main(project_id, dataset_id, credentials_json, dbt_path, dbt_target, cleanup
     create_dataset(client, dataset_id)
 
   try:
-    run_dbt_command(f"cd {dbt_path} && dbt deps")
-    run_dbt_command(f"cd {dbt_path} && dbt run --profiles-dir . --target {dbt_target}")
-    run_dbt_command(f"cd {dbt_path} && dbt test --profiles-dir . --target {dbt_target}")
+    # run_dbt_command(f"cd {dbt_path} && dbt deps")
+    run_dbt_command(f"cd {dbt_path} && docker run --env-file sa.env --rm dbt-bq-sandbox debug --profiles-dir . --target {dbt_target}")
+    # run_dbt_command(f"cd {dbt_path} && dbt test --profiles-dir . --target {dbt_target}")
   except Exception as e:
     print(e)
     if "pr_" in dataset_id:
