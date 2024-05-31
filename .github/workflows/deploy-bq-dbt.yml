@@ -76,15 +76,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # - name: Authenticate to GCP
-      #   uses: google-github-actions/auth@v1.1.1
-      #   with:
-      #     credentials_json: ${{ secrets.BQ_KEYFILE_JSON }}
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1.1.1
+        with:
+          credentials_json: ${{ secrets.BQ_KEYFILE_JSON }}
 
-      # - name: Setup gcloud
-      #   uses: google-github-actions/setup-gcloud@v0
-      #   with:
-      #     project_id: ${{ secrets.BQ_PROJECT }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.BQ_PROJECT }}
 
       - name: Determine Deployment
         
@@ -101,6 +101,7 @@ jobs:
           BQ_TOKEN_URI: ${{ secrets.BQ_TOKEN_URI }}
           BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
           BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
         run: |
           if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
             if [ "${{ github.event_name }}" == "pull_request" ]; then
