@@ -136,15 +136,15 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v0
-        with:
-          credentials_json: ${{ secrets.BQ_KEYFILE_JSON }}
+      # - name: Authenticate to GCP
+      #   uses: google-github-actions/auth@v0
+      #   with:
+      #     credentials_json: ${{ secrets.BQ_KEYFILE_JSON }}
 
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          project_id: ${{ secrets.BQ_PROJECT }}
+      # - name: Setup gcloud
+      #   uses: google-github-actions/setup-gcloud@v0
+      #   with:
+      #     project_id: ${{ secrets.BQ_PROJECT }}
 
       - name: Delete PR dataset in BigQuery
         run: |
