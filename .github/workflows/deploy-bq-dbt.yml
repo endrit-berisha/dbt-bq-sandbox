@@ -102,6 +102,8 @@ jobs:
           BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
           BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
+          
+        working-directory: ./dbt
         run: |
           if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
             if [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -110,16 +112,14 @@ jobs:
                 --project_id=${{ secrets.BQ_PROJECT }} \
                 --dataset_id="pr_db" \
                 --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
-                --dbt_path=./dbt \
                 --dbt_target="pr_db"
             else
               echo "DBT changes detected. Proceeding with deployment."
               python pr_database_manager.py \
-                --project_id=${{ secrets.BQ_PROJECT }} \
-                --dataset_id="dev" \
+                --project_id='${{ secrets.BQ_PROJECT }}' \
+                --dataset_id='${{ secrets.BQ_DATASET }}' \
                 --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
-                --dbt_path=./dbt \
-                --dbt_target="dev"
+                --dbt_target='${{ secrets.BQ_DATASET }}'
             fi
           else
             echo "No DBT changes detected. Skipping deployment."
