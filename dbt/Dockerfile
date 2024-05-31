@@ -7,4 +7,4 @@ COPY .env  /root/.dbt
 # Project
 WORKDIR /.dbt
 COPY . /.dbt
-RUN pip install dbt-bigquery
+RUN pip install dbt-bigquery==1.0.0

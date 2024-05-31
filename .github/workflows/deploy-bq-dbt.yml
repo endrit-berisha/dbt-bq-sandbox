@@ -4,15 +4,13 @@ on:
   pull_request:
     branches:
       - master
-      - develop
-      - workflow
+      - develop 
     paths:
       - 'dbt/**'
   push:
     branches:
       - master
       - develop
-      - workflow
     paths:
       - 'dbt/**'
 
@@ -95,12 +93,13 @@ jobs:
           BQ_DATASET: ${{ secrets.BQ_DATASET }}
           BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }}
           BQ_LOCATION: ${{ secrets.BQ_LOCATION }}
-          PROF_CLIENT_CERT_URL: ${{ secrets.PROF_CLIENT_CERT_URL }}
-          PROF_CLIENT_EMAIL: ${{ secrets.PROF_CLIENT_EMAIL }}
-          PROF_CLIENT_ID: ${{ secrets.PROF_CLIENT_ID }}
-          PROF_PRIVATE_KEY: ${{ secrets.PROF_PRIVATE_KEY }}
-          PROF_PRIVATE_KEY_ID: ${{ secrets.PROF_PRIVATE_KEY_ID }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
+          BQ_PRIVATE_KEY_ID: ${{ secrets.BQ_PRIVATE_KEY_ID }}
+          BQ_CLIENT_EMAIL: ${{ secrets.BQ_CLIENT_EMAIL }}
+          BQ_CLIENT_ID: ${{ secrets.BQ_CLIENT_ID }}
+          BQ_AUTH_URI: ${{ secrets.BQ_AUTH_URI }}
+          BQ_TOKEN_URI: ${{ secrets.BQ_TOKEN_URI }}
+          BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
+          BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
         run: |
           if [ "${{ needs.check.outputs.dbt_changes }}" == "TRUE" ]; then
             if [ "${{ github.event_name }}" == "pull_request" ]; then
