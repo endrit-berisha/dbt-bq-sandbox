@@ -45,8 +45,8 @@ def main(project_id, dataset_id, credentials_json, dbt_path, dbt_target, cleanup
     create_dataset(client, dataset_id)
 
   try:
-    run_dbt_command(f"cd {dbt_path} && dbt deps")
     run_dbt_command(f"cd {dbt_path} && dbt run --profiles-dir . --target {dbt_target}")
+    run_dbt_command(f"cd {dbt_path} && dbt deps")
     # run_dbt_command(f"cd {dbt_path} && dbt test --profiles-dir . --target {dbt_target}")
   except Exception as e:
     print(e)
