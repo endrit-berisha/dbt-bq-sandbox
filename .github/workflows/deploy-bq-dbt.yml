@@ -86,17 +86,18 @@ jobs:
         with:
           project_id: ${{ secrets.BQ_PROJECT }}
 
-      - id: validate_pre_deployment
-        if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE' && github.event_name == 'pull_request'
-        run: |
-          echo "DBT changes detected. Proceeding with pre-deployment."
-          python pr_database_manager.py \
-              --project_id=${{ secrets.BQ_PROJECT }} \
-              --dataset_id="pr_db" \
-              --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
-              --dbt_target="pr_db"
-  
-      - id: deployment
+      # - id: validate_pre_deployment
+      #   if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE' && github.event_name == 'pull_request'
+      #   run: |
+      #     echo "DBT changes detected. Proceeding with pre-deployment."
+      #     python pr_database_manager.py \
+      #         --project_id=${{ secrets.BQ_PROJECT }} \
+      #         --dataset_id="pr_db" \
+      #         --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
+      #         --dbt_target="pr_db"
+
+      - name: Deploy to BQ
+        id: deployment
         env:
           BQ_PROJECT: ${{ secrets.BQ_PROJECT }}
           BQ_DATASET: ${{ secrets.BQ_DATASET }}
@@ -111,6 +112,7 @@ jobs:
           BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
           BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
+          
         if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE' && github.event_name != 'pull_request'
         run: |
           echo "DBT changes detected. Proceeding with deployment."
