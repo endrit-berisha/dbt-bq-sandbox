@@ -117,11 +117,11 @@ jobs:
         run: |
           echo "DBT changes detected. Proceeding with deployment."
           python pr_database_manager.py \
-              --project_id='${{ secrets.BQ_PROJECT }}'' \
-              --dataset_id='${{ secrets.BQ_DATASET }}'' \
+              --project_id='${{ secrets.BQ_PROJECT }}' \
+              --dataset_id='${{ secrets.BQ_DATASET }}' \
               --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
               --dbt_path='./dbt' \
-              --dbt_target='${{ secrets.BQ_DATASET }}''
+              --dbt_target='${{ secrets.BQ_DATASET }}'
 
   cleanup:
     if: ${{ github.event.action == 'closed' }}
