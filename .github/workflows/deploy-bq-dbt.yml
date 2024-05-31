@@ -112,16 +112,16 @@ jobs:
           BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
           BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
-          
+
         if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE' && github.event_name != 'pull_request'
         run: |
           echo "DBT changes detected. Proceeding with deployment."
           python pr_database_manager.py \
-              --project_id=${{ secrets.BQ_PROJECT }} \
-              --dataset_id=${{ secrets.BQ_DATASET }} \
-              --credentials_json=${{ secrets.BQ_KEYFILE_JSON }} \
+              --project_id='${{ secrets.BQ_PROJECT }}'' \
+              --dataset_id='${{ secrets.BQ_DATASET }}'' \
+              --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
               --dbt_path='./dbt' \
-              --dbt_target=${{ secrets.BQ_DATASET }}
+              --dbt_target='${{ secrets.BQ_DATASET }}''
 
   cleanup:
     if: ${{ github.event.action == 'closed' }}
