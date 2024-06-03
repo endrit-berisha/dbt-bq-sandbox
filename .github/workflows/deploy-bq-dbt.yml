@@ -69,7 +69,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
@@ -103,7 +103,7 @@ jobs:
           BQ_DATASET: ${{ secrets.BQ_DATASET }}
           BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }}
           BQ_LOCATION: ${{ secrets.BQ_LOCATION }}
-          BQ_PRIVATE_KEY: ${{ secrets.BQ_PRIVATE_KEY_ID }}
+          BQ_PRIVATE_KEY: ${{ secrets.BQ_PRIVATE_KEY }}
           BQ_PRIVATE_KEY_ID: ${{ secrets.BQ_PRIVATE_KEY_ID }}
           BQ_CLIENT_EMAIL: ${{ secrets.BQ_CLIENT_EMAIL }}
           BQ_CLIENT_ID: ${{ secrets.BQ_CLIENT_ID }}
