@@ -27,12 +27,14 @@ def main(project_id, dataset_id, credentials_json, dbt_path, dbt_target, cleanup
   credentials = service_account.Credentials.from_service_account_info(json.loads(credentials_json))
   client = bigquery.Client(credentials=credentials, project=project_id)
 
+  full_dataset_id = f"{project_id}.{dataset_id}"
+
   if cleanup: # Drop PR dataset
-    delete_dataset(client, dataset_id)
+    delete_dataset(client, full_dataset_id)
     return
 
   if "pr_" in dataset_id:
-    create_dataset(client, dataset_id)
+    create_dataset(client, full_dataset_id)
 
   try:
     run_dbt_command(f"cd {dbt_path} && dbt deps")
@@ -43,11 +45,11 @@ def main(project_id, dataset_id, credentials_json, dbt_path, dbt_target, cleanup
     print(e)
     if "pr_" in dataset_id:
       print("Cleaning up PR dataset due to failure.")
-      delete_dataset(client, dataset_id)
+      delete_dataset(client, full_dataset_id)
     raise
 
   if "pr_" in dataset_id:
-    delete_dataset(client, dataset_id)
+    delete_dataset(client, full_dataset_id)
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description="Manage PR-specific BigQuery dataset")
