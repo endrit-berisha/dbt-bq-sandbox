@@ -1,0 +1,137 @@
+name: BQ DBT
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop 
+    paths:
+      - 'dbt/**'
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'dbt/**'
+
+concurrency:
+  group: ${{ github.ref }}
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+
+env:
+  BQ_PROJECT: ${{ secrets.BQ_PROJECT }}
+  BQ_DATASET: ${{ secrets.BQ_DATASET }}
+  BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }}
+  BQ_LOCATION: ${{ secrets.BQ_LOCATION }}
+  BQ_PRIVATE_KEY: ${{ secrets.BQ_PRIVATE_KEY }}
+  BQ_PRIVATE_KEY_ID: ${{ secrets.BQ_PRIVATE_KEY_ID }}
+  BQ_CLIENT_EMAIL: ${{ secrets.BQ_CLIENT_EMAIL }}
+  BQ_CLIENT_ID: ${{ secrets.BQ_CLIENT_ID }}
+  BQ_AUTH_URI: ${{ secrets.BQ_AUTH_URI }}
+  BQ_TOKEN_URI: ${{ secrets.BQ_TOKEN_URI }}
+  BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
+  BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
+  GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
+
+jobs:
+  check:
+    name: Check for DBT changes
+    runs-on: ubuntu-latest
+    outputs:
+      dbt_changes: ${{ steps.set_output.outputs.dbt_changes }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - id: changed
+        uses: dorny/paths-filter@v2
+        name: Get Changed Files
+        with:
+          filters: |
+            dbt:
+              - 'dbt/**'
+
+      - name: Debug Changed Files
+        run: |
+          echo "Changed files: ${{ steps.changed.outputs.dbt }}"
+
+      - id: dbt_changes
+        run: |
+          if [[ -n "${{ steps.changed.outputs.dbt }}" ]]; then
+            echo "dbt_changes=TRUE" >> $GITHUB_ENV
+            echo "DBT changes found in ${{ steps.changed.outputs.dbt }}"
+          else
+            echo "dbt_changes=false" >> $GITHUB_ENV
+          fi
+
+      - id: set_output
+        name: Set DBT_CHANGES output
+        run: echo "dbt_changes=${{ env.dbt_changes }}" >> $GITHUB_OUTPUT
+
+  apply:
+    name: Deploy DBT changes
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1.1.1
+        with:
+          credentials_json: ${{ secrets.BQ_KEYFILE_JSON }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.BQ_PROJECT }}
+
+      - name: Validate BQ Pre-Deployment
+        id: validate_pre_deployment
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "DBT changes detected. Proceeding with pre-deployment."
+          python pr_database_manager.py \
+              --project_id=${{ secrets.BQ_PROJECT }} \
+              --dataset_id="pr_db" \
+              --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
+              --dbt_path='./dbt' \
+              --dbt_target="pr_db"
+
+      - name: Deploy to BQ
+        id: deployment
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "DBT changes detected. Proceeding with deployment."
+          python pr_database_manager.py \
+              --project_id='${{ secrets.BQ_PROJECT }}' \
+              --dataset_id='${{ secrets.BQ_DATASET }}' \
+              --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
+              --dbt_path='./dbt' \
+              --dbt_target='dev'
+
+      - name: Delete PR dataset in BigQuery
+        if: always()
+        run: |
+          python pr_database_manager.py \
+            --project_id=${{ secrets.BQ_PROJECT }} \
+            --dataset_id="pr_db" \
+            --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
+            --dbt_path=./dbt \
+            --dbt_target="dev" \
+            --cleanup
