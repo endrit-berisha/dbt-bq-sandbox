@@ -103,18 +103,19 @@ jobs:
 
       - name: Pre-Deploy to BQ
         id: validate_pre_deployment
-        if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE' && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         run: |
           echo "DBT changes detected. Proceeding with pre-deployment."
           python pr_database_manager.py \
               --project_id=${{ secrets.BQ_PROJECT }} \
               --dataset_id="pr_db" \
               --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
+              --dbt_path='./dbt' \
               --dbt_target="pr_db"
 
       - name: Deploy to BQ
         id: deployment
-        if: ${{ needs.check.outputs.dbt_changes }} == 'TRUE' && github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request'
         run: |
           echo "DBT changes detected. Proceeding with deployment."
           python pr_database_manager.py \
@@ -122,7 +123,7 @@ jobs:
               --dataset_id='${{ secrets.BQ_DATASET }}' \
               --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
               --dbt_path='./dbt' \
-              --dbt_target='${{ secrets.BQ_DATASET }}'
+              --dbt_target='dev'
 
       - name: Delete PR dataset in BigQuery
         if: always()
