@@ -101,7 +101,7 @@ jobs:
         with:
           project_id: ${{ secrets.BQ_PROJECT }}
 
-      - name: Pre-Deploy to BQ
+      - name: Validate BQ Pre-Deployment
         id: validate_pre_deployment
         if: github.event_name == 'pull_request'
         run: |
