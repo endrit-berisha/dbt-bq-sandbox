@@ -26,6 +26,7 @@ permissions:
 env:
   BQ_PROJECT: ${{ secrets.BQ_PROJECT }}
   BQ_DATASET: ${{ secrets.BQ_DATASET }}
+  BQ_DATASET_PD: ${{ secrets.BQ_DATASET_PD }}
   BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }}
   BQ_LOCATION: ${{ secrets.BQ_LOCATION }}
   BQ_PRIVATE_KEY: ${{ secrets.BQ_PRIVATE_KEY }}
