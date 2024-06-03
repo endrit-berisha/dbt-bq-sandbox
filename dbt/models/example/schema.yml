@@ -11,4 +11,5 @@ sources:
     schema: raw
     tables:
       - name: dim_products
+      - name: dim_distributors
       - name: fact_depletions
