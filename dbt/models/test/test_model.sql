@@ -1,7 +1,13 @@
 {{ config(materialized='table') }}
 
 SELECT                                                                                                                                                               
-    cust_sales AS attribute_code,                                                                                                                                    
-    cust_sales_description AS attribute_desc,                                                                                                                        
-    beam_party_key AS party_key
+    CONCAT(
+      COALESCE(cust_sales, 'NAN'),
+      '~',
+      COALESCE(distr_chan, 'NAN'),
+      '~',
+      COALESCE(division, 'NAN'),
+      '~',
+      COALESCE(salesorg, 'NAN')
+    ) AS beam_party_key
 FROM {{ source('thebar_gl_raw_SRC', 'edw_customer') }}
