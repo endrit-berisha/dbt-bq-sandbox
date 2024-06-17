@@ -21,24 +21,6 @@ permissions:
   pull-requests: write
   issues: write
 
-# Environment Variables used in profiles.yml
-
-env:
-  BQ_PROJECT: ${{ secrets.BQ_PROJECT }}
-  BQ_DATASET: ${{ secrets.BQ_DATASET }}
-  BQ_DATASET_PD: ${{ secrets.BQ_DATASET_PD }}
-  BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }}
-  BQ_LOCATION: ${{ secrets.BQ_LOCATION }}
-  BQ_PRIVATE_KEY: ${{ secrets.BQ_PRIVATE_KEY }}
-  BQ_PRIVATE_KEY_ID: ${{ secrets.BQ_PRIVATE_KEY_ID }}
-  BQ_CLIENT_EMAIL: ${{ secrets.BQ_CLIENT_EMAIL }}
-  BQ_CLIENT_ID: ${{ secrets.BQ_CLIENT_ID }}
-  BQ_AUTH_URI: ${{ secrets.BQ_AUTH_URI }}
-  BQ_TOKEN_URI: ${{ secrets.BQ_TOKEN_URI }}
-  BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
-  BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
-  GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.BQ_KEYFILE_JSON }}
-
 jobs:
   check:
     name: Check for DBT changes
@@ -75,64 +57,20 @@ jobs:
         run: echo "dbt_changes=${{ env.dbt_changes }}" >> $GITHUB_OUTPUT
 
   apply:
-    name: Validate|Deploy BQ DBT
+    name: Deploy DBT Changes
     needs: check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1.1.1
-        with:
-          credentials_json: ${{ secrets.BQ_KEYFILE_JSON }}
-
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          project_id: ${{ secrets.BQ_PROJECT }}
-
-      - name: Validate PD BQ-DBT
-        id: validate_pre_deployment
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "DBT changes detected. Proceeding with pre-deployment."
-          python pd_db_manager.py \
-              --project_id=${{ secrets.BQ_PROJECT }} \
-              --dataset_id='${{ secrets.BQ_DATASET_PD }}' \
-              --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
-              --dbt_path='./dbt' \
-              --dbt_target="pd"
-
-      - name: Deploy BQ-DBT
-        id: deployment
-        if: github.event_name != 'pull_request'
-        run: |
-          echo "DBT changes detected. Proceeding with deployment."
-          python pd_db_manager.py \
-              --project_id='${{ secrets.BQ_PROJECT }}' \
-              --dataset_id='${{ secrets.BQ_DATASET }}' \
-              --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
-              --dbt_path='./dbt' \
-              --dbt_target='prod'
-
-      - name: Delete PD BQ Database
-        if: always()
-        run: |
-          python pd_db_manager.py \
-            --project_id=${{ secrets.BQ_PROJECT }} \
-            --dataset_id='${{ secrets.BQ_DATASET_PD }}' \
-            --credentials_json='${{ secrets.BQ_KEYFILE_JSON }}' \
-            --dbt_path=./dbt \
-            --dbt_target="pd" \
-            --cleanup
+    uses: endrit-berisha/dbt-common/.github/workflows/deploy-dbt.yml@main
+    secrets:
+      BQ_KEYFILE_JSON: ${{ secrets.BQ_KEYFILE_JSON }} 
+      BQ_PROJECT: ${{ secrets.BQ_PROJECT }}
+      BQ_DATASET: ${{ secrets.BQ_DATASET }}
+      BQ_DATASET_PD: ${{ secrets.BQ_DATASET_PD }}
+      BQ_PRIVATE_KEY: ${{ secrets.BQ_PRIVATE_KEY }}
+      BQ_PRIVATE_KEY_ID: ${{ secrets.BQ_PRIVATE_KEY_ID }}
+      BQ_CLIENT_EMAIL: ${{ secrets.BQ_CLIENT_EMAIL }}
+      BQ_CLIENT_ID: ${{ secrets.BQ_CLIENT_ID }}
+      BQ_AUTH_URI: ${{ secrets.BQ_AUTH_URI }}
+      BQ_TOKEN_URI: ${{ secrets.BQ_TOKEN_URI }}
+      BQ_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.BQ_AUTH_PROVIDER_X509_CERT_URL }}
+      BQ_CLIENT_X509_CERT_URI: ${{ secrets.BQ_CLIENT_X509_CERT_URI }}
+    
