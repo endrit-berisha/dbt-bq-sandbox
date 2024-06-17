@@ -1,0 +1,7 @@
+version: 2
+sources:
+  - name: thebar_gl_raw_SRC
+    database: sdg-team-suntoryglobal-lab
+    schema: thebar_gl_raw
+    tables:
+      - name: edw_customer
